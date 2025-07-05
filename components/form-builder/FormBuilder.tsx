@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useState, useRef, useEffect, useActionState } from "react";
 import { Trash2, PlusCircle } from "lucide-react";
 
 import { FormField, FormFieldType } from "./types";
@@ -38,7 +37,7 @@ export function FormBuilder() {
   const [newFieldRequired, setNewFieldRequired] = useState(false);
 
   const initialState: State = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(saveFormStructure, initialState);
+  const [state, dispatch] = useActionState(saveFormStructure, initialState);
 
   const dialogCloseRef = useRef<HTMLButtonElement>(null);
 
