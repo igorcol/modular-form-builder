@@ -1,19 +1,16 @@
-"use client";
-import FormBuilder from "@/components/form-builder/FormBuilder";
-import FormRenderer from "@/components/form-builder/FormRenderer";
-import { FormField } from "@/components/form-builder/types";
-import React, { useState } from "react";
+import { FormBuilder } from "@/components/form-builder/FormBuilder";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import React from "react";
 
-const Home = () => {
-  // Guarda a estrutura do formulário
-  const [formStructure, setFormStructure] = useState<FormField[] | null>(null);
-
-
-  // Callback que o FormBuilder chama
-  const handleFormCreation = (fields: FormField[]) => {
-    console.log("Estrutura recebida na página principal:", fields);
-    setFormStructure(fields);
-  };
+const Home = async () => {
+  
+  // Busca todos os formularios salvos no banco
+  const forms = await prisma?.form.findMany({
+    orderBy: {
+      createdAt: "desc"
+    }
+  })
 
   return (
     <main className="flex min-h-screen flex-col items-center p-12 md:p-24">
@@ -27,34 +24,32 @@ const Home = () => {
       </div>
 
       <div className="mt-10">
-        <FormBuilder onFormCreate={handleFormCreation} />
+        <FormBuilder />
       </div>
 
-      {/* JSON Da Estutura */}
-      {formStructure && (
-        <div className="mt-12 w-full max-w-3xl">
-          <h2 className="text-2xl font-semibold">
-            Estrutura do Formulário Gerada (JSON)
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            &quot;Esqueleto&quot; do formulário.
-          </p>
-          <pre className="mt-4 rounded-lg border bg-muted p-4 text-sm">
-            <code>{JSON.stringify(formStructure, null, 2)}</code>
-          </pre>
+     {/* Lista os formulário */}
+     <div className="mt-12 w-full max-w-2xl">
+        <h2 className="text-2xl font-semibold">Formulários Criados</h2>
+        <div className="mt-4 space-y-3">
+          {forms!.length > 0 ? (
+            forms!.map((form) => (
+              <Link
+                key={form.id}
+                href={`/form/${form.id}`}
+                passHref
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  {form.name}
+                </Button>
+              </Link>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum formulário criado ainda. Crie o primeiro!
+            </p>
+          )}
         </div>
-      )}
-
-      {/* Form Renderer */}
-      {formStructure && formStructure.length > 0 && (
-        <div className="mt-12 w-full max-w-3xl">
-          <h2 className="text-2xl font-semibold">Formulário Renderizado</h2>
-          <p className="mt-2 text-sm text-muted-foreground mb-4">
-            Resultado final.
-          </p>
-          <FormRenderer fields={formStructure}/>
-        </div>
-      )}
+      </div>
 
     </main>
   );
